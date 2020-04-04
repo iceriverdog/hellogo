@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"dataStruct/LinkedLists/linkedList"
+	"github.com/iceriverdog/hellogo/dataStruct/LinkedLists/linkedList"
 )
 
 func main() {
