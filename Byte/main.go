@@ -9,6 +9,14 @@ func main() {
 	// used, by convention, to distinguish byte values from 8-bit unsigned
 	// integer values.
 
+	// Convert between byte array/slice and string
+
+	//b := []byte("ABC€")
+	//fmt.Println(b) // [65 66 67 226 130 172]
+
+	//s := string([]byte{65, 66, 67, 226, 130, 172})
+	//fmt.Println(s) // ABC€
+
 	//type byte = uint8
 	var c1 uint8 = 'a'
 	var c2 byte = '0' //字符的0
@@ -27,5 +35,6 @@ func main() {
 	var c3 int = '北' //overflow溢出
 	fmt.Printf("c3=%c c3对应码值=%d\n", c3, c3)
 	fmt.Println(c3)
-
+	// %q 字符对应的字面值，用单引号表示出来
+	fmt.Printf("%q", c3)
 }

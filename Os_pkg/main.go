@@ -1,100 +1,133 @@
-//package main
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+)
+
+func HandleErr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+//// "IO 读写操作"
+//func Copy(srcfilename, dstfilename string) (int, error) {
 //
-//import (
-//	"fmt"
-//	"os"
-//	"path/filepath"
-//)
+//	// 文件打开
+//	srcfile, err := os.OpenFile(srcfilename, os.O_RDONLY, os.ModePerm)
+//	HandleErr(err)
+//	defer srcfile.Close()
+//
+//	dstfile, err := os.OpenFile(dstfilename, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
+//	HandleErr(err)
+//	defer dstfile.Close()
+//
+//	temp, err := os.OpenFile(srcfilename+"temp.txt", os.O_CREATE|os.O_RDWR, os.ModePerm)
+//	defer temp.Close()
+//
+//	// 临时文件断点
+//	temp.Seek(0, 0)
+//	bytes := make([]byte, 100, 100)
+//	nbyte, err := temp.Read(bytes)
+//	cnt, err := strconv.ParseInt(string(bytes[:nbyte]),10,64)
+//	fmt.Println(cnt)
+//
+//	srcfile.Seek(cnt, 0)
+//	dstfile.Seek(cnt, 0)
+//	data := make([]byte, 1024, 1024)
+//	total := 0
+//	for {
+//		n, err := srcfile.Read(data)
+//		if n == 0 || err == io.EOF {
+//			fmt.Println(err)
+//			//os.Remove(temp)
+//			break
+//		}
+//		fmt.Printf("读取%d byte\n", n)
+//		dstfile.Write(data[:n])
+//		total += n
+//		temp.Seek(0,0)
+//		temp.WriteString(strconv.Itoa(total))
+//		fmt.Println(total)
+//		HandleErr(err)
+//		//if total > 100000 {
+//		//	panic("断电")
+//		//}
+//	}
+//	return total, nil
+//}
 //
 //func main() {
 //
-//	fileInfo, err := os.Stat("/home/wk/hello.txt")
-//	if err != nil {
-//		fmt.Printf("err : %v", err)
-//		return
-//	}
-//	fmt.Printf("fileInfo's type:%T\n", fileInfo)
+//	srcfilename := "/home/wk/go/src/github.com/iceriverdog/hellogo/Os_pkg/wk.jpeg"
 //
-//	fmt.Println(filepath.Abs("hello.txt"))
+//	dstfilename := "/home/wk/go/src/github.com/iceriverdog/hellogo/Os_pkg/dstWK.jpeg"
+//
+//	n, err := Copy(srcfilename, dstfilename)
+//	HandleErr(err)
+//	fmt.Printf("总共%d字节", n)
+//
+//
 //}
+
+// bufio
+//func main() {
+//	srcfilename := "/home/wk/go/src/github.com/iceriverdog/hellogo/Os_pkg/hello"
+//	file1, err := os.Open(srcfilename)
+//	if err != nil {
+//		fmt.Println(err)
+//	}
+//	defer file1.Close()
 //
-package main
+//	//bufio read
+//	b1 := bufio.NewReader(file1)
+//	p := make([]byte,1024,1024)
+//	n, err := b1.Read(p)
+//	fmt.Println(n)
+//	fmt.Println(string(p[:n]))
+//
+//	//bufio scanner
+//	b2 := bufio.NewReader(os.Stdin)
+//	s, err := b2.ReadString('\n')
+//	fmt.Println(s)
+//
+//	//bufio write
+//	file2name := "/home/wk/go/src/github.com/iceriverdog/hellogo/Os_pkg/dsthello"
+//	b3,err := os.OpenFile(file2name, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+//	b4 := bufio.NewWriter(b3)
+//	n2, err := b4.WriteString("hello, worild")
+//	fmt.Println(n2)
+//	b4.Flush()
+//	io.EOF
+//}
 
-import "fmt"
+// ioutil
+//func NopCloser(r io.Reader) io.ReadCloser
+//func ReadAll(r io.Reader) ([]byte, error)
+//func ReadDir(dirname string) ([]os.FileInfo, error)
+//func ReadFile(filename string) ([]byte, error)
+//func TempDir(dir, pattern string) (name string, err error)
+//func TempFile(dir, pattern string) (f *os.File, err error)
+//func WriteFile(filename string, data []byte, perm os.FileMode) error
 
-func IsExist(s byte, m map[uint8]int) bool {
-	_, ok := m[s]
-	return ok
-}
-
-func TypeOfString(s string) int {
-	a := make(map[uint8]int)
-	if s == "" {
-		return 0
-	} else if len(s) == 1 {
-		return 1
-	} else {
-		a[s[0]] = 1
-		for i := 1; i < len(s); i++ {
-			if IsExist(s[i], a) {
-				k := 1
-				for j := 1; j <= a[s[i]] && i + j < len(s); j++ {
-					if s[i] != s[i+j] {
-						k = 0
-						break
-					}
-				}
-				if k == 1{
-					a[s[i]]++
-				}
-			}
-			a[s[i]] = 1
-		}
-}
-	var total int
-	for _, v := range a {
-		total += v
+// 遍历文件夹
+func ListDir(dirName string, level int) {
+	fileInfo, err := ioutil.ReadDir(dirName)
+	HandleErr(err)
+	s := "|--"
+	for i := 0; i < level; i++ {
+		s += "|--"
 	}
-	return total
-}
-func Who(arr []string) {
-	for i := 0; i < len(arr); i++ {
-		//var m map[uint8]int
-		m := make(map[uint8]int)
-		s := arr[i]
-		for j := 0; j < len(s); j++ {
-			if _, ok := m[s[j]]; !ok {
-				m[s[j]] = 1
-			} else {
-				m[s[j]]++
-			}
-		}
-		ji := 0
-		for _, v := range m {
-			ji += v
-		}
-		if ji%2 == 1 || len(m) == 1{
-			fmt.Println("wk")
-		} else {
-			fmt.Println("tw")
+	for i := 0; i < len(fileInfo); i++ {
+		fmt.Println(s + fileInfo[i].Name())
+		if fileInfo[i].IsDir() {
+			ListDir(dirName + "/" + fileInfo[i].Name(), level+1)
 		}
 	}
 }
-
 func main() {
-	//var s string
-	//fmt.Scanln(&s)
-	//n := TypeOfString(s)
-	//fmt.Println(n)
-	var arr []string
-	var n int
-	fmt.Scanln(&n)
-	for i := 1; i <=n; i++ {
-		var  s string
-		fmt.Scanln(&s)
-		arr = append(arr, s)
-	}
-	fmt.Println(arr)
-	//arr := []string{"aba", "ab"}
-	Who(arr)
+	dirName := "/home/wk/go/src/github.com/iceriverdog/hellogo"
+	ListDir(dirName, 0)
 }
